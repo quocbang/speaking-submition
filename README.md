@@ -150,3 +150,43 @@ Return doc links
 - **Session management**: Unique sessionId per submission batch
 - **Error isolation**: Failed file doesn't affect others (but stops batch)
 - **Network handling**: Proper error responses and timeouts
+- **SPA Routing**: Requires `.htaccess` file for Apache servers to enable client-side routing for class-specific paths
+
+## Server Configuration
+
+For the class-specific paths (`/lop-4658`, `/lop-275878`, `/lop-243578`) to work, the web server must be configured to serve `index.html` for all routes.
+
+### Apache Servers (.htaccess)
+The included `.htaccess` file handles SPA routing for Apache servers:
+
+```apache
+Options -MultiViews
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [QSA,L]
+```
+
+### GitHub Pages
+For GitHub Pages hosting, the `.nojekyll` file disables Jekyll processing. However, GitHub Pages doesn't support `.htaccess` files. You'll need to create physical directories with `index.html` files for each class path:
+
+```
+/
+├── index.html (main file)
+├── lop-4658/
+│   └── index.html (copy of main index.html)
+├── lop-275878/
+│   └── index.html (copy of main index.html)
+└── lop-243578/
+    └── index.html (copy of main index.html)
+```
+
+### Other Web Servers
+For Nginx, add this to your server block:
+```nginx
+location / {
+    try_files $uri $uri/ /index.html;
+}
+```
+
+For other servers, configure them to serve `index.html` as the fallback for all routes that don't match actual files.

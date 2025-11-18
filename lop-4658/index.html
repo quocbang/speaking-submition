@@ -1,0 +1,884 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Dũng English Speaking - Nộp Bài</title>
+  <link rel="icon" type="image/png" href="https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_document_x16.png">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      padding: 40px;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 32px;
+      font-size: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.2s ease;
+      background: white;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* File Upload Styling */
+    .file-upload-area {
+      border: 2px dashed #cbd5e0;
+      border-radius: 8px;
+      padding: 40px 20px;
+      text-align: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      background: #f8fafc;
+      position: relative;
+    }
+
+    .file-upload-area:hover,
+    .file-upload-area.dragover {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+
+    .file-upload-area.dragover {
+      border-color: #4c63d2;
+      background: #e6f0ff;
+    }
+
+    .file-upload-icon {
+      font-size: 48px;
+      color: #a0aec0;
+      margin-bottom: 16px;
+    }
+
+    .file-upload-text {
+      color: #4a5568;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .file-upload-subtext {
+      color: #718096;
+      font-size: 14px;
+    }
+
+    .file-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-list {
+      margin-top: 16px;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: #f7fafc;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }
+
+    .file-item.uploading {
+      background: #e6f0ff;
+      border-color: #667eea;
+    }
+
+    .file-item.completed {
+      background: #c6f6d5;
+      border-color: #9ae6b4;
+    }
+
+    .file-item.error {
+      background: #fed7d7;
+      border-color: #feb2b2;
+    }
+
+    .file-item-icon {
+      font-size: 20px;
+      margin-right: 12px;
+      color: #667eea;
+    }
+
+    .file-item-info {
+      flex: 1;
+    }
+
+    .file-item-name {
+      font-weight: 500;
+      color: #2d3748;
+      font-size: 14px;
+    }
+
+    .file-item-size {
+      color: #718096;
+      font-size: 12px;
+    }
+
+    .file-item-status {
+      font-size: 12px;
+      color: #718096;
+      margin-top: 2px;
+    }
+
+    .file-item-progress {
+      width: 100%;
+      height: 3px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .file-item-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .file-item-remove {
+      color: #e53e3e;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: background 0.2s ease;
+    }
+
+    .file-item-remove:hover {
+      background: #fed7d7;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 8px;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .submit-btn.loading {
+      position: relative;
+    }
+
+    .submit-btn.loading::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      margin: auto;
+      border: 2px solid transparent;
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .status-message {
+      text-align: center;
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .status-success {
+      background: #c6f6d5;
+      color: #22543d;
+      border: 1px solid #9ae6b4;
+    }
+
+    .status-error {
+      background: #fed7d7;
+      color: #742a2a;
+      border: 1px solid #feb2b2;
+    }
+
+    .required {
+      color: #e53e3e;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 600px) {
+      .container {
+        padding: 24px;
+        margin: 16px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .file-upload-area {
+        padding: 32px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎤 Nộp Bài Nói</h1>
+    <p class="subtitle">Gửi file ghi âm của bạn để được chữa bài</p>
+
+    <form id="submitForm">
+      <div class="form-group">
+        <label class="form-label" for="email">
+          Email <span class="required">*</span>
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="form-input"
+          placeholder="your.email@example.com"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="fullName">
+          Họ và Tên <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="fullName"
+          name="fullName"
+          class="form-input"
+          placeholder="Nguyễn Văn A"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="phone">
+          Số Điện Thoại <span class="required">*</span>
+        </label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          class="form-input"
+          placeholder="0901234567"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="topic">
+          Chủ Đề <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="topic"
+          name="topic"
+          class="form-input"
+          placeholder="Giới thiệu bản thân"
+          required
+        >
+      </div>
+
+
+
+      <div class="form-group">
+        <label class="form-label">
+          File Ghi Âm <span class="required">*</span>
+        </label>
+        <div class="file-upload-area" id="fileUploadArea">
+          <div class="file-upload-icon">🎵</div>
+          <div class="file-upload-text">Kéo thả files ghi âm vào đây</div>
+          <div class="file-upload-subtext">hoặc click để chọn files (MP3, WAV, M4A - tối đa 50MB mỗi file)</div>
+          <input
+            type="file"
+            id="audioFile"
+            name="audioFile"
+            class="file-input"
+            accept=".mp3,.wav,.m4a,audio/*"
+            multiple
+          >
+        </div>
+        <div class="file-list" id="fileList"></div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        📤 Gửi Bài Nộp
+      </button>
+
+      <div class="progress-bar" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <div class="status-message" id="statusMessage"></div>
+    </form>
+  </div>
+
+  <script>
+    (function() {
+      const form = document.getElementById('submitForm');
+      const fileUploadArea = document.getElementById('fileUploadArea');
+      const fileInput = document.getElementById('audioFile');
+      const fileList = document.getElementById('fileList');
+      const submitBtn = document.getElementById('submitBtn');
+      const progressBar = document.getElementById('progressBar');
+      const progressFill = document.getElementById('progressFill');
+      const statusMessage = document.getElementById('statusMessage');
+
+      const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+      const ALLOWED_TYPES = ['audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/m4a', 'audio/mp4'];
+
+      // Class configuration for different paths
+      const classConfigs = {
+        '/lop-4658': {
+          from: 'lop-4658',
+          options: [
+            { value: 't46 chiều (dl thứ 4 hàng tuần)', text: 't46 chiều (dl thứ 4 hàng tuần)' },
+            { value: 't46 tối (dl thứ 4 hàng tuần)', text: 't46 tối (dl thứ 4 hàng tuần)' },
+            { value: 't5cn tối (dl thứ 5 hàng tuần)', text: 't5cn tối (dl thứ 5 hàng tuần)' }
+          ]
+        },
+        '/lop-275878': {
+          from: 'lop-275878',
+          options: [
+            { value: 't27 (dl t7 hằng tuần)', text: 't27 (dl t7 hằng tuần)' },
+            { value: 't5cn (dl chủ nhật hằng tuần)', text: 't5cn (dl chủ nhật hằng tuần)' },
+            { value: 't7cn (dl chủ nhật hằng tuần)', text: 't7cn (dl chủ nhật hằng tuần)' }
+          ]
+        },
+        '/lop-243578': {
+          from: 'lop-243578',
+          options: [
+            { value: 't24 (dl thứ 4 hàng tuần)', text: 't24 (dl thứ 4 hàng tuần)' },
+            { value: 't35 (dl thứ 5 hàng tuần)', text: 't35 (dl thứ 5 hàng tuần)' },
+            { value: 't78 (dl cn hàng tuần)', text: 't78 (dl cn hàng tuần)' }
+          ]
+        }
+      };
+
+      // Path detection for from parameter and class config
+      const currentPath = window.location.pathname;
+      const classConfig = classConfigs[currentPath];
+      const fromValue = classConfig ? classConfig.from : 'default';
+
+      // Add class field dynamically if on a class-specific path
+      if (classConfig) {
+        const topicField = document.querySelector('input[name="topic"]').closest('.form-group');
+        const classField = document.createElement('div');
+        classField.className = 'form-group';
+
+        let optionsHtml = '<option value="">Chọn lớp</option>';
+        classConfig.options.forEach(option => {
+          optionsHtml += `<option value="${option.value}">${option.text}</option>`;
+        });
+
+        classField.innerHTML = `
+          <label class="form-label" for="class">
+            Lớp <span class="required">*</span>
+          </label>
+          <select
+            id="class"
+            name="class"
+            class="form-input"
+            required
+          >
+            ${optionsHtml}
+          </select>
+        `;
+        topicField.insertAdjacentElement('afterend', classField);
+      }
+
+      let selectedFiles = [];
+      let isUploading = false;
+
+      // Warn user before leaving during upload
+      window.addEventListener('beforeunload', (e) => {
+        if (isUploading) {
+          e.preventDefault();
+          e.returnValue = 'Đang tải lên files. Bạn có chắc muốn rời khỏi trang? Files đang tải có thể bị mất.';
+          return e.returnValue;
+        }
+      });
+
+      // File upload area interactions - only trigger on the upload area itself
+      fileUploadArea.addEventListener('click', (e) => {
+        // Prevent triggering if clicking on file items or other elements
+        if (e.target.closest('.file-item') || e.target.closest('.file-item-remove')) {
+          return;
+        }
+        // Only trigger file dialog if clicking directly on upload area elements
+        if (e.target === fileUploadArea ||
+            e.target.classList.contains('file-upload-icon') ||
+            e.target.classList.contains('file-upload-text') ||
+            e.target.classList.contains('file-upload-subtext')) {
+          fileInput.click();
+        }
+      });
+
+      fileUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+      });
+
+      fileUploadArea.addEventListener('dragleave', () => {
+        fileUploadArea.classList.remove('dragover');
+      });
+
+      fileUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        const files = Array.from(e.dataTransfer.files);
+        if (files.length > 0) {
+          handleFileSelect(files);
+        }
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+          handleFileSelect(files);
+        }
+      });
+
+      function handleFileSelect(files) {
+        let validFiles = [];
+        let errors = [];
+
+        files.forEach(file => {
+          // Validate file type
+          if (!ALLOWED_TYPES.includes(file.type) &&
+              !file.name.toLowerCase().match(/\.(mp3|wav|m4a)$/)) {
+            errors.push(`${file.name}: Chỉ chấp nhận file MP3, WAV, hoặc M4A!`);
+            return;
+          }
+
+          // Validate file size
+          if (file.size > MAX_FILE_SIZE) {
+            errors.push(`${file.name}: File quá lớn! Tối đa 50MB.`);
+            return;
+          }
+
+          // Check for duplicates
+          if (selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+            errors.push(`${file.name}: File đã được chọn!`);
+            return;
+          }
+
+          validFiles.push(file);
+        });
+
+        if (errors.length > 0) {
+          showStatus(errors.join('<br>'), 'error');
+        }
+
+        if (validFiles.length > 0) {
+          selectedFiles.push(...validFiles);
+          displayFiles();
+          if (errors.length === 0) {
+            hideStatus();
+          }
+        }
+      }
+
+      function displayFiles() {
+        fileList.innerHTML = '';
+        selectedFiles.forEach((file, index) => {
+          const fileItem = document.createElement('div');
+          fileItem.className = 'file-item';
+          fileItem.setAttribute('data-index', index);
+          fileItem.innerHTML = `
+            <div class="file-item-icon">🎵</div>
+            <div class="file-item-info">
+              <div class="file-item-name">${file.name}</div>
+              <div class="file-item-size">${formatFileSize(file.size)}</div>
+              <div class="file-item-status">Chờ tải lên</div>
+              <div class="file-item-progress">
+                <div class="file-item-progress-fill"></div>
+              </div>
+            </div>
+            <div class="file-item-remove" onclick="removeFile(${index})">✕</div>
+          `;
+          fileList.appendChild(fileItem);
+        });
+      }
+
+      function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        displayFiles();
+        // Reset file input if no files selected
+        if (selectedFiles.length === 0) {
+          fileInput.value = '';
+        }
+      }
+
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      // Form submission
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (selectedFiles.length === 0) {
+          showStatus('Vui lòng chọn ít nhất một file ghi âm!', 'error');
+          return;
+        }
+
+        // Validate form
+        const formData = new FormData(form);
+        const email = formData.get('email').trim();
+        const fullName = formData.get('fullName').trim();
+        const phone = formData.get('phone').trim();
+        const topic = formData.get('topic').trim();
+        const classValue = formData.get('class') ? formData.get('class').trim() : '';
+
+        // Check required fields
+        if (!email || !fullName || !phone || !topic) {
+          showStatus('Vui lòng điền đầy đủ thông tin!', 'error');
+          return;
+        }
+
+        // Class is only required for class-specific paths
+        if (classConfig && !classValue) {
+          showStatus('Vui lòng chọn lớp!', 'error');
+          return;
+        }
+
+        // Generate unique session ID for this submission batch
+        const sessionId = 'submit_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+        // Start upload
+        setLoading(true);
+        showProgress();
+
+        try {
+          const result = await uploadSubmission(formData, sessionId);
+          const fileCount = selectedFiles.length;
+          
+          // Build success message with doc link if available
+          let successMessage = `🎉 Nộp bài thành công! ${fileCount} file đã được tải lên. Bạn sẽ nhận được email xác nhận.`;
+
+          if (result.docLink) {
+            successMessage += '<br><br><strong>📄 Link tài liệu:</strong><br>';
+            successMessage += `<a href="${result.docLink}" target="_blank" style="color: #2563eb; text-decoration: underline;">Xem tài liệu</a>`;
+          }
+          
+          showStatus(successMessage, 'success');
+
+          // Clear uploaded files and reset for next submission
+          selectedFiles = [];
+          displayFiles();
+          hideProgress();
+          setLoading(false);
+          fileInput.value = '';
+
+        } catch (error) {
+          console.error('Upload error:', error);
+          showStatus('Có lỗi xảy ra khi nộp bài. Vui lòng thử lại.', 'error');
+          setLoading(false);
+          hideProgress();
+        }
+      });
+
+      async function uploadSubmission(formData, sessionId) {
+        const totalFiles = selectedFiles.length;
+        let completedFiles = 0;
+        const email = formData.get('email');
+
+        // Upload files one by one
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const file = selectedFiles[i];
+          const fileIndex = i;
+
+          try {
+            // Update file status to uploading
+            updateFileStatus(fileIndex, 'uploading', 'Đang tải lên...');
+            showFileProgress(fileIndex, true);
+
+            // Get presigned URL
+            const presignedData = await getPresignedUrl(sessionId, email, file.name);
+
+            // Upload to Supabase
+            await uploadToSupabase(file, presignedData, fileIndex);
+
+            // Update file status to completed
+            updateFileStatus(fileIndex, 'completed', 'Hoàn thành ✓');
+            showFileProgress(fileIndex, false);
+            completedFiles++;
+
+            // Update overall progress
+            updateProgress((completedFiles / totalFiles) * 100);
+
+          } catch (error) {
+            console.error(`Upload failed for ${file.name}:`, error);
+            updateFileStatus(fileIndex, 'error', 'Lỗi tải lên ✗');
+            throw error;
+          }
+        }
+
+        // Finalize submission
+        const finalResponse = await finalizeSubmission(sessionId, email, formData.get('fullName'), formData.get('phone'), formData.get('topic'), fromValue, classValue);
+
+        return { success: true, filesUploaded: completedFiles, sessionId: sessionId, docLink: finalResponse.doc_link };
+      }
+
+      function getPresignedUrl(sessionId, email, fileName) {
+        const url = `https://n8n.dungenglishspeaking.com/webhook/speaking/submit?sessionId=${encodeURIComponent(sessionId)}&email=${encodeURIComponent(email)}&fileName=${encodeURIComponent(fileName)}`;
+        return fetch(url)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+          });
+      }
+
+      function uploadToSupabase(file, presignedData, fileIndex) {
+        return new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          const url = `https://hwqxigmopqkiqmogkaxt.storage.supabase.co/storage/v1${presignedData.url}`;
+
+          xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+              const percentComplete = (e.loaded / e.total) * 100;
+              updateFileProgress(fileIndex, percentComplete);
+            }
+          });
+
+          xhr.addEventListener('load', () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve({ success: true });
+            } else {
+              reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));
+            }
+          });
+
+          xhr.addEventListener('error', () => {
+            reject(new Error('Network error during upload'));
+          });
+
+          xhr.addEventListener('abort', () => {
+            reject(new Error('Upload aborted'));
+          });
+
+          xhr.open('PUT', url);
+          xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+          xhr.send(file);
+        });
+      }
+
+      function finalizeSubmission(sessionId, email, fullName, phone, topic, from, classValue) {
+        return fetch('https://n8n.dungenglishspeaking.com/webhook/speaking/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            sessionId,
+            email,
+            fullName,
+            phone,
+            topic,
+            from,
+            class: classValue
+          })
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          return response.json();
+        });
+      }
+
+      function updateFileStatus(fileIndex, status, message) {
+        const fileItems = fileList.querySelectorAll('.file-item');
+        const fileItem = fileItems[fileIndex];
+        if (fileItem) {
+          // Remove existing status classes
+          fileItem.classList.remove('uploading', 'completed', 'error');
+          // Add new status class
+          if (status !== 'waiting') {
+            fileItem.classList.add(status);
+          }
+          // Update status text
+          const statusElement = fileItem.querySelector('.file-item-status');
+          if (statusElement) {
+            statusElement.textContent = message;
+          }
+        }
+      }
+
+      function showFileProgress(fileIndex, show) {
+        const fileItems = fileList.querySelectorAll('.file-item');
+        const fileItem = fileItems[fileIndex];
+        if (fileItem) {
+          const progressElement = fileItem.querySelector('.file-item-progress');
+          if (progressElement) {
+            progressElement.style.display = show ? 'block' : 'none';
+          }
+        }
+      }
+
+      function updateFileProgress(fileIndex, percent) {
+        const fileItems = fileList.querySelectorAll('.file-item');
+        const fileItem = fileItems[fileIndex];
+        if (fileItem) {
+          const progressFill = fileItem.querySelector('.file-item-progress-fill');
+          if (progressFill) {
+            progressFill.style.width = percent + '%';
+          }
+        }
+      }
+
+      function setLoading(loading) {
+        isUploading = loading;
+        submitBtn.disabled = loading;
+        submitBtn.classList.toggle('loading', loading);
+        submitBtn.textContent = loading ? 'Đang tải lên...' : '📤 Gửi Bài Nộp';
+      }
+
+      function showProgress() {
+        progressBar.style.display = 'block';
+      }
+
+      function hideProgress() {
+        progressBar.style.display = 'none';
+        progressFill.style.width = '0%';
+      }
+
+      function updateProgress(percent) {
+        progressFill.style.width = percent + '%';
+      }
+
+      function showStatus(message, type) {
+        statusMessage.innerHTML = message;
+        statusMessage.className = `status-message status-${type}`;
+        statusMessage.style.display = 'block';
+      }
+
+      function hideStatus() {
+        statusMessage.style.display = 'none';
+      }
+
+      // Make removeFile global for onclick
+      window.removeFile = removeFile;
+    })();
+  </script>
+</body>
+</html>
