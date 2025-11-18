@@ -391,6 +391,8 @@
         >
       </div>
 
+
+
       <div class="form-group">
         <label class="form-label">
           File Ghi Âm <span class="required">*</span>
@@ -436,6 +438,66 @@
 
       const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
       const ALLOWED_TYPES = ['audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/m4a', 'audio/mp4'];
+
+      // Class configuration for different paths
+      const classConfigs = {
+        '/lop-4658': {
+          from: 'lop-4658',
+          options: [
+            { value: 't46 chiều (dl thứ 4 hàng tuần)', text: 't46 chiều (dl thứ 4 hàng tuần)' },
+            { value: 't46 tối (dl thứ 4 hàng tuần)', text: 't46 tối (dl thứ 4 hàng tuần)' },
+            { value: 't5cn tối (dl thứ 5 hàng tuần)', text: 't5cn tối (dl thứ 5 hàng tuần)' }
+          ]
+        },
+        '/lop-275878': {
+          from: 'lop-275878',
+          options: [
+            { value: 't27 (dl t7 hằng tuần)', text: 't27 (dl t7 hằng tuần)' },
+            { value: 't5cn (dl chủ nhật hằng tuần)', text: 't5cn (dl chủ nhật hằng tuần)' },
+            { value: 't7cn (dl chủ nhật hằng tuần)', text: 't7cn (dl chủ nhật hằng tuần)' }
+          ]
+        },
+        '/lop-243578': {
+          from: 'lop-243578',
+          options: [
+            { value: 't24 (dl thứ 4 hàng tuần)', text: 't24 (dl thứ 4 hàng tuần)' },
+            { value: 't35 (dl thứ 5 hàng tuần)', text: 't35 (dl thứ 5 hàng tuần)' },
+            { value: 't78 (dl cn hàng tuần)', text: 't78 (dl cn hàng tuần)' }
+          ]
+        }
+      };
+
+      // Path detection for from parameter and class config
+      const currentPath = window.location.pathname;
+      const classConfig = classConfigs[currentPath];
+      const fromValue = classConfig ? classConfig.from : 'default';
+
+      // Add class field dynamically if on a class-specific path
+      if (classConfig) {
+        const topicField = document.querySelector('input[name="topic"]').closest('.form-group');
+        const classField = document.createElement('div');
+        classField.className = 'form-group';
+
+        let optionsHtml = '<option value="">Chọn lớp</option>';
+        classConfig.options.forEach(option => {
+          optionsHtml += `<option value="${option.value}">${option.text}</option>`;
+        });
+
+        classField.innerHTML = `
+          <label class="form-label" for="class">
+            Lớp <span class="required">*</span>
+          </label>
+          <select
+            id="class"
+            name="class"
+            class="form-input"
+            required
+          >
+            ${optionsHtml}
+          </select>
+        `;
+        topicField.insertAdjacentElement('afterend', classField);
+      }
 
       let selectedFiles = [];
       let isUploading = false;
@@ -583,9 +645,17 @@
         const fullName = formData.get('fullName').trim();
         const phone = formData.get('phone').trim();
         const topic = formData.get('topic').trim();
+        const classValue = formData.get('class') ? formData.get('class').trim() : '';
 
+        // Check required fields
         if (!email || !fullName || !phone || !topic) {
           showStatus('Vui lòng điền đầy đủ thông tin!', 'error');
+          return;
+        }
+
+        // Class is only required for class-specific paths
+        if (classConfig && !classValue) {
+          showStatus('Vui lòng chọn lớp!', 'error');
           return;
         }
 
@@ -662,7 +732,7 @@
         }
 
         // Finalize submission
-        const finalResponse = await finalizeSubmission(sessionId, email, formData.get('fullName'), formData.get('phone'), formData.get('topic'));
+        const finalResponse = await finalizeSubmission(sessionId, email, formData.get('fullName'), formData.get('phone'), formData.get('topic'), fromValue, classValue);
 
         return { success: true, filesUploaded: completedFiles, sessionId: sessionId, docLink: finalResponse.doc_link };
       }
@@ -712,7 +782,7 @@
         });
       }
 
-      function finalizeSubmission(sessionId, email, fullName, phone, topic) {
+      function finalizeSubmission(sessionId, email, fullName, phone, topic, from, classValue) {
         return fetch('https://n8n.dungenglishspeaking.com/webhook/speaking/submit', {
           method: 'POST',
           headers: {
@@ -723,7 +793,9 @@
             email,
             fullName,
             phone,
-            topic
+            topic,
+            from,
+            class: classValue
           })
         })
         .then(response => {

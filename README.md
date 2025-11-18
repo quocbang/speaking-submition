@@ -15,14 +15,14 @@ sequenceDiagram
     F->>F: Generate sessionId
 
     loop For each file
-        F->>N: GET presigned URL<br/>/webhook-test/speaking/submit<br/>?sessionId=X&email=Y&fileName=Z
+        F->>N: GET presigned URL<br/>/webhook/speaking/submit<br/>?sessionId=X&email=Y&fileName=Z
         N-->>F: {url, token}
         F->>S: PUT file<br/>storage/v1{url}<br/>Content-Type: audio/*
         S-->>F: 200 OK
         F->>F: Update UI status
     end
 
-    F->>N: POST finalize<br/>/webhook-test/speaking/submit<br/>{sessionId, email, fullName, phone, topic}
+    F->>N: POST finalize<br/>/webhook/speaking/submit<br/>{sessionId, email, fullName, phone, topic, from, class}
     N->>S: Process uploaded files
     N->>G: Create Google Doc
     G-->>N: Doc URL
@@ -53,7 +53,7 @@ Return doc links
 ### `getPresignedUrl(sessionId, email, fileName)`
 - **Purpose**: Retrieves presigned URL for file upload
 - **Method**: GET
-- **Endpoint**: `https://n8n-mac.quocbangdev.asia/webhook-test/speaking/submit`
+- **Endpoint**: `https://n8n.dungenglishspeaking.com/webhook/speaking/submit`
 - **Parameters**: sessionId, email, fileName (query params)
 - **Response**: `{ "url": "/object/upload/sign/.../filename?token=...", "token": "..." }`
 
@@ -65,19 +65,57 @@ Return doc links
 - **Body**: File blob data
 - **Progress**: Tracks upload progress per file
 
-### `finalizeSubmission(sessionId, email, fullName, phone, topic)`
+### `finalizeSubmission(sessionId, email, fullName, phone, topic, from, class)`
 - **Purpose**: Completes submission and generates document
 - **Method**: POST
-- **Endpoint**: `https://n8n-mac.quocbangdev.asia/webhook-test/speaking/submit`
+- **Endpoint**: `https://n8n.dungenglishspeaking.com/webhook/speaking/submit`
 - **Headers**: `Content-Type: application/json`
-- **Body**:
+- **Body** (when accessed via `/lop-4658` path):
   ```json
   {
     "sessionId": "submit_1234567890_abc123def",
     "email": "user@example.com",
     "fullName": "Nguyễn Văn A",
     "phone": "0901234567",
-    "topic": "Giới thiệu bản thân"
+    "topic": "Giới thiệu bản thân",
+    "from": "lop-4658",
+    "class": "t46 chiều (dl thứ 4 hàng tuần)"
+  }
+  ```
+- **Body** (when accessed via `/lop-275878` path):
+  ```json
+  {
+    "sessionId": "submit_1234567890_abc123def",
+    "email": "user@example.com",
+    "fullName": "Nguyễn Văn A",
+    "phone": "0901234567",
+    "topic": "Giới thiệu bản thân",
+    "from": "lop-275878",
+    "class": "t27 (dl t7 hằng tuần)"
+  }
+  ```
+- **Body** (when accessed via `/lop-243578` path):
+  ```json
+  {
+    "sessionId": "submit_1234567890_abc123def",
+    "email": "user@example.com",
+    "fullName": "Nguyễn Văn A",
+    "phone": "0901234567",
+    "topic": "Giới thiệu bản thân",
+    "from": "lop-243578",
+    "class": "t24 (dl thứ 4 hàng tuần)"
+  }
+  ```
+- **Body** (when accessed via regular path):
+  ```json
+  {
+    "sessionId": "submit_1234567890_abc123def",
+    "email": "user@example.com",
+    "fullName": "Nguyễn Văn A",
+    "phone": "0901234567",
+    "topic": "Giới thiệu bản thân",
+    "from": "default",
+    "class": ""
   }
   ```
 - **Response**: `{ "doc_link": "https://docs.google.com/document/d/..." }`
