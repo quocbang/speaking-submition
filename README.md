@@ -168,18 +168,23 @@ RewriteRule ^ index.html [QSA,L]
 ```
 
 ### GitHub Pages
-For GitHub Pages hosting, the `.nojekyll` file disables Jekyll processing. However, GitHub Pages doesn't support `.htaccess` files. You'll need to create physical directories with `index.html` files for each class path:
+For GitHub Pages hosting, the `.nojekyll` file disables Jekyll processing. Each class path has its own `index.html` file with hardcoded class options:
 
 ```
 /
-├── index.html (main file)
+├── index.html (main file - no class field)
 ├── lop-4658/
-│   └── index.html (copy of main index.html)
+│   └── index.html (lop-4658 class options hardcoded)
 ├── lop-275878/
-│   └── index.html (copy of main index.html)
+│   └── index.html (lop-275878 class options hardcoded)
 └── lop-243578/
-    └── index.html (copy of main index.html)
+    └── index.html (lop-243578 class options hardcoded)
 ```
+
+**Class Options:**
+- **lop-4658**: t46 chiều (dl thứ 4 hàng tuần), t46 tối (dl thứ 4 hàng tuần), t5cn tối (dl thứ 5 hàng tuần)
+- **lop-275878**: t27 (dl t7 hằng tuần), t5cn (dl chủ nhật hằng tuần), t7cn (dl chủ nhật hằng tuần)
+- **lop-243578**: t24 (dl thứ 4 hàng tuần), t35 (dl thứ 5 hàng tuần), t78 (dl cn hàng tuần)
 
 ### Other Web Servers
 For Nginx, add this to your server block:
