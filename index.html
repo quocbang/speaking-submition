@@ -668,7 +668,7 @@
       }
 
       function getPresignedUrl(sessionId, email, fileName) {
-        const url = `https://n8n-mac.quocbangdev.asia/webhook/speaking/submit?sessionId=${encodeURIComponent(sessionId)}&email=${encodeURIComponent(email)}&fileName=${encodeURIComponent(fileName)}`;
+        const url = `https://n8n.dungenglishspeaking.com/webhook/speaking/submit?sessionId=${encodeURIComponent(sessionId)}&email=${encodeURIComponent(email)}&fileName=${encodeURIComponent(fileName)}`;
         return fetch(url)
           .then(response => {
             if (!response.ok) {
@@ -713,7 +713,7 @@
       }
 
       function finalizeSubmission(sessionId, email, fullName, phone, topic) {
-        return fetch('https://n8n-mac.quocbangdev.asia/webhook/speaking/submit', {
+        return fetch('https://n8n.dungenglishspeaking.com/webhook/speaking/submit', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
