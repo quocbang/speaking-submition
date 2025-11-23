@@ -455,6 +455,7 @@
 
       const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
       const ALLOWED_TYPES = ['audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/m4a', 'audio/mp4'];
+      const BASE_URL = 'https://n8n.srv1145234.hstgr.cloud/webhook/speaking';
 
       // Fixed configuration for lop-243578
       const fromValue = 'lop-243578';
@@ -698,7 +699,7 @@
       }
 
       function getPresignedUrl(sessionId, email, fileName) {
-        const url = `https://n8n.dungenglishspeaking.com/webhook/speaking/submit?sessionId=${encodeURIComponent(sessionId)}&email=${encodeURIComponent(email)}&fileName=${encodeURIComponent(fileName)}`;
+        const url = `${BASE_URL}/submit?sessionId=${encodeURIComponent(sessionId)}&email=${encodeURIComponent(email)}&fileName=${encodeURIComponent(fileName)}`;
         return fetch(url)
           .then(response => {
             if (!response.ok) {
@@ -743,7 +744,7 @@
       }
 
       function finalizeSubmission(sessionId, email, fullName, phone, topic, from, classValue) {
-        return fetch('https://n8n.dungenglishspeaking.com/webhook/speaking/submit', {
+        return fetch(`${BASE_URL}/submit`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
