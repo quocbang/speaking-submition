@@ -632,11 +632,16 @@
           const fileCount = selectedFiles.length;
           
           // Build success message with doc link if available
-          let successMessage = `🎉 Nộp bài thành công! ${fileCount} file đã được tải lên. Bạn sẽ nhận được email xác nhận.`;
+          let successMessage = `🎉 Nộp bài thành công! ${fileCount} file đã được tải lên. `;
 
           if (result.docLink) {
             successMessage += '<br><br><strong>📄 Link tài liệu:</strong><br>';
             successMessage += `<a href="${result.docLink}" target="_blank" style="color: #2563eb; text-decoration: underline;">Xem tài liệu</a>`;
+          }
+
+          if (result.folderLink) {
+            successMessage += '<br><br><strong>📁 Thư mục chứa file của bạn:</strong><br>';
+            successMessage += `<a href="${result.folderLink}" target="_blank" style="color: #2563eb; text-decoration: underline;">Mở thư mục</a>`;
           }
           
           showStatus(successMessage, 'success');
@@ -695,7 +700,7 @@
         // Finalize submission
         const finalResponse = await finalizeSubmission(sessionId, email, formData.get('fullName'), formData.get('phone'), /* formData.get('topic') */ null, fromValue, formData.get('class'));
 
-        return { success: true, filesUploaded: completedFiles, sessionId: sessionId, docLink: finalResponse.doc_link };
+        return { success: true, filesUploaded: completedFiles, sessionId: sessionId, docLink: finalResponse.doc_link, folderLink: finalResponse.folder_link };
       }
 
       function getPresignedUrl(sessionId, email, fileName) {
