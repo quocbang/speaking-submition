@@ -649,7 +649,7 @@
         const classValue = formData.get('class') ? formData.get('class').trim() : '';
 
         // Check required fields
-        if (!email || !fullName || !phone || !topic) {
+        if (!email || !fullName || !phone) {
           showStatus('Vui lòng điền đầy đủ thông tin!', 'error');
           return;
         }
