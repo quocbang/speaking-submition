@@ -425,19 +425,18 @@
         >
       </div>
 
-      <!-- <div class="form-group">
+      <div class="form-group">
         <label class="form-label" for="topic">
-          Chủ Đề <span class="required">*</span>
+          Ghi chú
         </label>
         <input
           type="text"
           id="topic"
           name="topic"
           class="form-input"
-          placeholder="Giới thiệu bản thân"
-          required
+          placeholder="Ghi chú (tùy chọn)"
         >
-      </div> -->
+      </div>
 
 
 
@@ -717,7 +716,7 @@
         const email = formData.get('email').trim();
         const fullName = formData.get('fullName').trim();
         const phone = formData.get('phone').trim();
-        const topic = formData.get('topic').trim();
+        const topic = document.getElementById('topic').value.trim();
         const classValue = formData.get('class') ? formData.get('class').trim() : '';
 
         // Check required fields
@@ -810,7 +809,7 @@
         }
 
         // Finalize submission
-        const finalResponse = await finalizeSubmission(sessionId, email, formData.get('fullName'), formData.get('phone'), formData.get('topic'), fromValue, classValue);
+        const finalResponse = await finalizeSubmission(sessionId, email, formData.get('fullName'), formData.get('phone'), document.getElementById('topic').value.trim(), fromValue, classValue);
 
         return { success: true, filesUploaded: completedFiles, sessionId: sessionId, docLink: finalResponse.doc_link, folderLink: finalResponse.folder_link };
       }
@@ -871,7 +870,7 @@
             email,
             fullName,
             phone,
-            topic,
+            topic: topic || '',
             from,
             class: classValue
           })
