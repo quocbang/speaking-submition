@@ -698,7 +698,7 @@
         }
 
         // Finalize submission
-        const finalResponse = await finalizeSubmission(sessionId, email, formData.get('fullName'), formData.get('phone'), formData.get('topic'), fromValue, formData.get('class'));
+        const finalResponse = await finalizeSubmission(sessionId, email, formData.get('fullName'), formData.get('phone'), /* formData.get('topic') */ null, fromValue, formData.get('class'));
 
         return { success: true, filesUploaded: completedFiles, sessionId: sessionId, docLink: finalResponse.doc_link, folderLink: finalResponse.folder_link };
       }
