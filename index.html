@@ -326,6 +326,45 @@
       .file-upload-area {
         padding: 32px 16px;
       }
+
+      .class-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    .class-selection {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .class-question {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .class-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .class-btn {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .class-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     }
   </style>
 </head>
@@ -333,6 +372,15 @@
   <div class="container">
     <h1>Nộp bài Speaking _ Dũng English Speaking</h1>
     <p class="subtitle">Gửi file ghi âm của bạn để được chữa bài</p>
+
+    <div class="class-selection" id="classSelection">
+      <p class="class-question">Bạn đang học lớp nào?</p>
+      <div class="class-buttons">
+        <button class="class-btn" data-class="lop-4658">Lớp 4658</button>
+        <button class="class-btn" data-class="lop-275878">Lớp 275878</button>
+        <button class="class-btn" data-class="lop-243578">Lớp 243578</button>
+      </div>
+    </div>
 
     <form id="submitForm">
       <div class="form-group">
@@ -472,6 +520,30 @@
       const currentPath = window.location.pathname;
       const classConfig = classConfigs[currentPath];
       const fromValue = classConfig ? classConfig.from : 'default';
+
+      // Show class selection only on root page
+      const classSelection = document.getElementById('classSelection');
+      const submitForm = document.getElementById('submitForm');
+      if (!classConfig) {
+        // On root page, show class selection, hide form
+        classSelection.style.display = 'block';
+        submitForm.style.display = 'none';
+      } else {
+        // On class pages, hide class selection, show form
+        classSelection.style.display = 'none';
+        submitForm.style.display = 'block';
+      }
+
+      // Add event listeners for class buttons
+      if (classSelection) {
+        const classBtns = classSelection.querySelectorAll('.class-btn');
+        classBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const classPath = btn.getAttribute('data-class');
+            window.location.href = `/${classPath}`;
+          });
+        });
+      }
 
       // Add class field dynamically if on a class-specific path
       if (classConfig) {
