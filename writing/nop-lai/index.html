@@ -1,0 +1,752 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Dũng English Speaking - Nộp Bài</title>
+  <link rel="icon" type="image/png" href="https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_document_x16.png">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: rgb(160, 82, 61);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      padding: 40px;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 32px;
+      font-size: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.2s ease;
+      background: white;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 8px;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .submit-btn.loading {
+      position: relative;
+    }
+
+    .submit-btn.loading::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      margin: auto;
+      border: 2px solid transparent;
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .status-message {
+      text-align: center;
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .status-success {
+      background: #c6f6d5;
+      color: #22543d;
+      border: 1px solid #9ae6b4;
+    }
+
+    .status-error {
+      background: #fed7d7;
+      color: #742a2a;
+      border: 1px solid #feb2b2;
+    }
+
+    .required {
+      color: #e53e3e;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 600px) {
+      .container {
+        padding: 24px;
+        margin: 16px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: 5% auto;
+      padding: 0;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 80vh;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      animation: slideIn 0.3s ease-out;
+      overflow: hidden;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .modal-body {
+      padding: 24px;
+      max-height: calc(80vh - 140px);
+      overflow-y: auto;
+    }
+
+    .modal-textarea {
+      width: 100%;
+      min-height: 400px;
+      padding: 16px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      resize: vertical;
+      transition: border-color 0.2s ease;
+    }
+
+    .modal-textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      background: #f8fafc;
+      border-top: 1px solid #e1e5e9;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .modal-btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .modal-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .modal-btn-secondary {
+      background: #e2e8f0;
+      color: #4a5568;
+    }
+
+    .modal-btn-secondary:hover {
+      background: #cbd5e0;
+    }
+
+    .edit-text-btn {
+      background: none;
+      border: 1px solid #667eea;
+      color: #667eea;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 8px;
+    }
+
+    .edit-text-btn:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .auto-save-indicator {
+      font-size: 12px;
+      color: #718096;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .auto-save-indicator.saving {
+      color: #3182ce;
+    }
+
+    .auto-save-indicator.saved {
+      color: #38a169;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Nộp bài viết_ Dũng English Speaking</h1>
+    <p class="subtitle">Gửi bài viết của bạn để được chữa bài</p>
+
+    <form id="submitForm">
+      <div class="form-group">
+        <label class="form-label" for="email">
+          Email <span class="required">*</span>
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="form-input"
+          placeholder="your.email@example.com"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="fullName">
+          Họ và Tên <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="fullName"
+          name="fullName"
+          class="form-input"
+          placeholder="Nguyễn Văn A"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="phone">
+          Số Điện Thoại <span class="required">*</span>
+        </label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          class="form-input"
+          placeholder="0901234567"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="class">
+          Lớp <span class="required">*</span>
+        </label>
+        <select
+          id="class"
+          name="class"
+          class="form-input"
+          required
+        >
+          <option value="">Chọn lớp</option>
+          <!-- Options will be populated by JavaScript -->
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="topic">
+          Ghi chú
+        </label>
+        <input
+          type="text"
+          id="topic"
+          name="topic"
+          class="form-input"
+          placeholder="Nhập Ghi chú (tùy chọn)"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="writingContent">
+          Nội dung bài viết <span class="required">*</span>
+        </label>
+        <textarea
+          id="writingContent"
+          name="writingContent"
+          class="form-input form-textarea"
+          placeholder="Nhập nội dung bài viết của bạn ở đây..."
+          required
+        ></textarea>
+        <button type="button" class="edit-text-btn" id="editTextBtn">
+          ✏️ Chỉnh sửa trong popup
+        </button>
+        <div class="auto-save-indicator" id="autoSaveIndicator">
+          Đã lưu tự động
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        📤 Gửi Bài Nộp
+      </button>
+
+      <div class="status-message" id="statusMessage"></div>
+    </form>
+  </div>
+
+  <!-- Modal for text editing -->
+  <div id="textEditorModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Chỉnh sửa nội dung bài viết</h2>
+        <button class="modal-close" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <textarea
+          id="modalTextarea"
+          class="modal-textarea"
+          placeholder="Nhập nội dung bài viết của bạn ở đây..."
+        ></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-secondary" id="modalCancel">Hủy</button>
+        <button class="modal-btn modal-btn-primary" id="modalSave">Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const form = document.getElementById('submitForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const statusMessage = document.getElementById('statusMessage');
+      const classSelect = document.getElementById('class');
+      const writingContent = document.getElementById('writingContent');
+      const editTextBtn = document.getElementById('editTextBtn');
+      const autoSaveIndicator = document.getElementById('autoSaveIndicator');
+
+      // Modal elements
+      const modal = document.getElementById('textEditorModal');
+      const modalTextarea = document.getElementById('modalTextarea');
+      const modalClose = document.getElementById('modalClose');
+      const modalCancel = document.getElementById('modalCancel');
+      const modalSave = document.getElementById('modalSave');
+
+      const BASE_URL = 'https://n8n.dungenglishspeaking.com/webhook/writing';
+
+      // Fixed configuration for writing
+      const fromValue = 'writing';
+
+      let isSubmitting = false;
+      let autoSaveTimeout;
+
+      // Load classes from API
+      loadClasses();
+
+      function loadClasses() {
+        // Try to fetch from classes.json
+        fetch('../../classes.json')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('API not available');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Assuming data is an array of class objects with value and text
+            populateClasses(data);
+          })
+          .catch(error => {
+            console.log('Using default classes:', error);
+            // Default classes if API fails
+            const defaultClasses = [
+              { value: 'lop-243578', text: 'Lớp 243578' },
+              { value: 'lop-cuoi-tuan', text: 'Lớp Cuối Tuần' },
+              { value: 'lop-4658', text: 'Lớp 4658' },
+              { value: 'nop-lai', text: 'Nộp Lại' }
+            ];
+            populateClasses(defaultClasses);
+          });
+      }
+
+      function populateClasses(classes) {
+        classSelect.innerHTML = '<option value="">Chọn lớp</option>';
+        classes.forEach(cls => {
+          const option = document.createElement('option');
+          option.value = cls.value;
+          option.textContent = cls.text;
+          classSelect.appendChild(option);
+        });
+      }
+
+      // localStorage functions
+      const STORAGE_KEY = 'writing_draft_nop-lai';
+
+      function saveToLocalStorage() {
+        const formData = {
+          email: document.getElementById('email').value,
+          fullName: document.getElementById('fullName').value,
+          phone: document.getElementById('phone').value,
+          class: document.getElementById('class').value,
+          topic: document.getElementById('topic').value,
+          writingContent: document.getElementById('writingContent').value,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+      }
+
+      function loadFromLocalStorage() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          try {
+            const formData = JSON.parse(saved);
+            document.getElementById('email').value = formData.email || '';
+            document.getElementById('fullName').value = formData.fullName || '';
+            document.getElementById('phone').value = formData.phone || '';
+            document.getElementById('class').value = formData.class || '';
+            document.getElementById('topic').value = formData.topic || '';
+            document.getElementById('writingContent').value = formData.writingContent || '';
+            return true;
+          } catch (e) {
+            console.error('Error loading from localStorage:', e);
+            return false;
+          }
+        }
+        return false;
+      }
+
+      function clearLocalStorage() {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+
+      function showAutoSaveIndicator(status) {
+        autoSaveIndicator.style.display = 'block';
+        autoSaveIndicator.className = 'auto-save-indicator';
+
+        if (status === 'saving') {
+          autoSaveIndicator.classList.add('saving');
+          autoSaveIndicator.textContent = 'Đang lưu...';
+        } else if (status === 'saved') {
+          autoSaveIndicator.classList.add('saved');
+          autoSaveIndicator.textContent = 'Đã lưu tự động';
+          setTimeout(() => {
+            autoSaveIndicator.style.display = 'none';
+          }, 2000);
+        }
+      }
+
+      // Modal functions
+      function openModal() {
+        modalTextarea.value = writingContent.value;
+        modal.style.display = 'block';
+        modalTextarea.focus();
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+
+      function saveModalContent() {
+        writingContent.value = modalTextarea.value;
+        closeModal();
+        // Trigger auto-save
+        handleInputChange();
+      }
+
+      // Event listeners for modal
+      editTextBtn.addEventListener('click', openModal);
+      modalClose.addEventListener('click', closeModal);
+      modalCancel.addEventListener('click', closeModal);
+      modalSave.addEventListener('click', saveModalContent);
+
+      // Close modal when clicking outside
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+
+      // Auto-save functionality
+      function handleInputChange() {
+        clearTimeout(autoSaveTimeout);
+        showAutoSaveIndicator('saving');
+
+        autoSaveTimeout = setTimeout(() => {
+          saveToLocalStorage();
+          showAutoSaveIndicator('saved');
+        }, 1000); // Save after 1 second of no typing
+      }
+
+      // Add input event listeners for auto-save
+      const inputs = ['email', 'fullName', 'phone', 'class', 'topic', 'writingContent'];
+      inputs.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.addEventListener('input', handleInputChange);
+          element.addEventListener('change', handleInputChange);
+        }
+      });
+
+      // Load saved data on page load
+      loadFromLocalStorage();
+
+      // Form submission
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Validate form
+        const formData = new FormData(form);
+        const email = formData.get('email').trim();
+        const fullName = formData.get('fullName').trim();
+        const phone = formData.get('phone').trim();
+        const topic = formData.get('topic').trim();
+        const classValue = formData.get('class').trim();
+        const writingContent = formData.get('writingContent').trim();
+
+        // Check required fields
+        if (!email || !fullName || !phone || !classValue || !writingContent) {
+          showStatus('Vui lòng điền đầy đủ thông tin!', 'error');
+          return;
+        }
+
+        // Generate unique session ID
+        const sessionId = 'writing_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+        // Start submission
+        setLoading(true);
+
+        try {
+          const result = await submitWriting(formData, sessionId);
+          
+          // Build success message with doc link if available
+          let successMessage = '🎉 Nộp bài thành công! ';
+
+          if (result.doc_link) {
+            successMessage += '<br><br><strong>📄 Link tài liệu:</strong><br>';
+            successMessage += `<a href="${result.doc_link}" target="_blank" style="color: #2563eb; text-decoration: underline;">Xem tài liệu</a>`;
+          }
+          
+          showStatus(successMessage, 'success');
+
+          // Clear saved draft on successful submission
+          clearLocalStorage();
+
+          // Reset form
+          form.reset();
+
+        } catch (error) {
+          console.error('Submission error:', error);
+          showStatus('Có lỗi xảy ra khi nộp bài. Vui lòng thử lại.', 'error');
+        } finally {
+          setLoading(false);
+        }
+      });
+
+      async function submitWriting(formData, sessionId) {
+        const email = formData.get('email');
+        const fullName = formData.get('fullName');
+        const phone = formData.get('phone');
+        const topic = formData.get('topic');
+        const classValue = formData.get('class');
+        const writingContent = formData.get('writingContent');
+
+        // Submit directly with writing content in body
+        const finalResponse = await finalizeSubmission(sessionId, email, fullName, phone, topic, fromValue, classValue, writingContent);
+
+        return finalResponse;
+      }
+
+      function finalizeSubmission(sessionId, email, fullName, phone, topic, from, classValue, writingContent) {
+        return fetch(`${BASE_URL}/submit`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            sessionId,
+            email,
+            fullName,
+            phone,
+            topic: topic || '',
+            from,
+            class: classValue,
+            writingContent
+          })
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          return response.json();
+        });
+      }
+
+      function setLoading(loading) {
+        isSubmitting = loading;
+        submitBtn.disabled = loading;
+        submitBtn.classList.toggle('loading', loading);
+        submitBtn.textContent = loading ? 'Đang gửi...' : '📤 Gửi Bài Nộp';
+      }
+
+      function showStatus(message, type) {
+        statusMessage.innerHTML = message;
+        statusMessage.className = `status-message status-${type}`;
+        statusMessage.style.display = 'block';
+      }
+
+      function hideStatus() {
+        statusMessage.style.display = 'none';
+      }
+    })();
+  </script>
+</body>
+</html>

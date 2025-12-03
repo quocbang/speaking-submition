@@ -7,24 +7,14 @@ sequenceDiagram
     participant U as User
     participant F as Frontend
     participant N as N8N
-    participant S as Supabase
     participant G as Google Docs
 
-    U->>F: Submit form with files
+    U->>F: Submit form with text content
     F->>F: Validate form data
     F->>F: Generate sessionId
 
-    loop For each file
-        F->>N: GET presigned URL<br/>/webhook/speaking/submit<br/>?sessionId=X&email=Y&fileName=Z
-        N-->>F: {url, token}
-        F->>S: PUT file<br/>storage/v1{url}<br/>Content-Type: audio/*
-        S-->>F: 200 OK
-        F->>F: Update UI status
-    end
-
-    F->>N: POST finalize<br/>/webhook/speaking/submit<br/>{sessionId, email, fullName, phone, topic, from, class}
-    N->>S: Process uploaded files
-    N->>G: Create Google Doc
+    F->>N: POST /webhook/writing/submit<br/>{sessionId, email, fullName, phone, topic, from, class, writingContent}
+    N->>G: Create Google Doc with text content
     G-->>N: Doc URL
     N-->>F: {doc_link}
 
@@ -65,57 +55,22 @@ Return doc links
 - **Body**: File blob data
 - **Progress**: Tracks upload progress per file
 
-### `finalizeSubmission(sessionId, email, fullName, phone, topic, from, class)`
-- **Purpose**: Completes submission and generates document
+### `submitWriting(sessionId, email, fullName, phone, topic, from, class, writingContent)`
+- **Purpose**: Submits writing content directly
 - **Method**: POST
-- **Endpoint**: `https://n8n.dungenglishspeaking.com/webhook/speaking/submit`
+- **Endpoint**: `https://n8n.dungenglishspeaking.com/webhook/writing/submit`
 - **Headers**: `Content-Type: application/json`
-- **Body** (when accessed via `/lop-4658` path):
+- **Body**:
   ```json
   {
-    "sessionId": "submit_1234567890_abc123def",
+    "sessionId": "writing_1234567890_abc123def",
     "email": "user@example.com",
     "fullName": "Nguyễn Văn A",
     "phone": "0901234567",
-    "topic": "Giới thiệu bản thân",
-    "from": "lop-4658",
-    "class": "t46 chiều (dl thứ 4 hàng tuần)"
-  }
-  ```
-- **Body** (when accessed via `/lop-275878` path):
-  ```json
-  {
-    "sessionId": "submit_1234567890_abc123def",
-    "email": "user@example.com",
-    "fullName": "Nguyễn Văn A",
-    "phone": "0901234567",
-    "topic": "Giới thiệu bản thân",
-    "from": "lop-275878",
-    "class": "t27 (dl t7 hằng tuần)"
-  }
-  ```
-- **Body** (when accessed via `/lop-243578` path):
-  ```json
-  {
-    "sessionId": "submit_1234567890_abc123def",
-    "email": "user@example.com",
-    "fullName": "Nguyễn Văn A",
-    "phone": "0901234567",
-    "topic": "Giới thiệu bản thân",
-    "from": "lop-243578",
-    "class": "t24 (dl thứ 4 hàng tuần)"
-  }
-  ```
-- **Body** (when accessed via regular path):
-  ```json
-  {
-    "sessionId": "submit_1234567890_abc123def",
-    "email": "user@example.com",
-    "fullName": "Nguyễn Văn A",
-    "phone": "0901234567",
-    "topic": "Giới thiệu bản thân",
-    "from": "default",
-    "class": ""
+    "topic": "Free text topic input", // Optional free text
+    "from": "writing",
+    "class": "lop-243578", // Selected from dropdown loaded from classes.json
+    "writingContent": "This is the text content of the writing submission..."
   }
   ```
 - **Response**: `{ "doc_link": "https://docs.google.com/document/d/..." }`
@@ -142,10 +97,12 @@ Return doc links
 - **Overall progress**: Combined progress bar (completed_files / total_files * 100)
 - **Success message**: Shows file count + doc link
 - **Form reset**: Automatic after 30 seconds
+- **Writing submission**: Topic is free text input (optional), class field is a dropdown loaded from `classes.json`
 
 ## Technical Details
 
-- **File validation**: MP3, WAV, M4A only, max 50MB each
+- **File validation**: MP3, WAV, M4A only, max 50MB each (for audio submissions). For writing submissions, text content is uploaded as a .txt file.
+- **Topics for writing**: Loaded dynamically from `classes.json` file for flexibility.
 - **Progress tracking**: XMLHttpRequest upload progress events
 - **Session management**: Unique sessionId per submission batch
 - **Error isolation**: Failed file doesn't affect others (but stops batch)
@@ -172,19 +129,31 @@ For GitHub Pages hosting, the `.nojekyll` file disables Jekyll processing. Each 
 
 ```
 /
-├── index.html (main file - no class field)
+├── index.html (main file - class selection for speaking and writing)
+├── classes.json (topics for writing submissions)
 ├── lop-4658/
-│   └── index.html (lop-4658 class options hardcoded)
+│   └── index.html (lop-4658 speaking class options hardcoded)
 ├── lop-275878/
-│   └── index.html (lop-275878 class options hardcoded)
-└── lop-243578/
-    └── index.html (lop-243578 class options hardcoded)
+│   └── index.html (lop-275878 speaking class options hardcoded)
+├── lop-243578/
+│   └── index.html (lop-243578 speaking class options hardcoded)
+└── writing/
+    ├── index.html (writing submission with class selection - DEPRECATED)
+    ├── lop-243578/
+    │   └── index.html (writing submission for lop-243578)
+    ├── lop-cuoi-tuan/
+    │   └── index.html (writing submission for lop-cuoi-tuan)
+    ├── lop-4658/
+    │   └── index.html (writing submission for lop-4658)
+    └── nop-lai/
+        └── index.html (writing submission for nop-lai)
 ```
 
 **Class Options:**
 - **lop-4658**: t46 chiều (dl thứ 4 hàng tuần), t46 tối (dl thứ 4 hàng tuần), t5cn tối (dl thứ 5 hàng tuần)
 - **lop-275878**: t27 (dl t7 hằng tuần), t5cn (dl chủ nhật hằng tuần), t7cn (dl chủ nhật hằng tuần)
 - **lop-243578**: t24 (dl thứ 4 hàng tuần), t35 (dl thứ 5 hàng tuần), t78 (dl cn hàng tuần)
+- **writing**: Separate pages for lop-243578, lop-cuoi-tuan, lop-4658, nop-lai (classes loaded from classes.json)
 
 ### Other Web Servers
 For Nginx, add this to your server block:
