@@ -674,6 +674,11 @@
             successMessage += '<br><br><strong>📄 Link tài liệu:</strong><br>';
             successMessage += `<a href="${result.doc_link}" target="_blank" style="color: #2563eb; text-decoration: underline;">Xem tài liệu</a>`;
           }
+
+          if (result.folder_link) {
+            successMessage += '<br><br><strong>📁 Thư mục chứa file của bạn:</strong><br>';
+            successMessage += `<a href="${result.folder_link}" target="_blank" style="color: #2563eb; text-decoration: underline;">Mở thư mục</a>`;
+          }
           
           showStatus(successMessage, 'success');
 
