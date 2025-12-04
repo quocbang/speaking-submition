@@ -491,8 +491,8 @@
       loadClasses();
 
       function loadClasses() {
-        // Try to fetch from classes.json
-        fetch('../../classes.json')
+        // Try to fetch from API
+        fetch(`${BASE_URL}/class?from=${fromValue}`)
           .then(response => {
             if (!response.ok) {
               throw new Error('API not available');
