@@ -670,13 +670,13 @@
           // Build success message with doc link if available
           let successMessage = '🎉 Nộp bài thành công! ';
 
-          if (result.doc_link) {
+          if (result.link) {
             successMessage += '<br><br><strong>📄 Link tài liệu:</strong><br>';
-            successMessage += `<a href="${result.doc_link}" target="_blank" style="color: #2563eb; text-decoration: underline;">Xem tài liệu</a>`;
+            successMessage += `<a href="${result.link}" target="_blank" style="color: #2563eb; text-decoration: underline;">Xem tài liệu</a>`;
           }
 
           if (result.folder_link) {
-            successMessage += '<br><br><strong>📁 Thư mục chứa file của bạn:</strong><br>';
+            successMessage += '<br><br><strong>📁 Link thư mục chứa file của bạn:</strong><br>';
             successMessage += `<a href="${result.folder_link}" target="_blank" style="color: #2563eb; text-decoration: underline;">Mở thư mục</a>`;
           }
           
