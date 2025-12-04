@@ -499,8 +499,9 @@
             }
             return response.json();
           })
-          .then(data => {
-            // Assuming data is an array of class objects with value and text
+          .then(result => {
+            // Extract data array from response object
+            const data = result.data || [];
             populateClasses(data);
           })
           .catch(error => {
