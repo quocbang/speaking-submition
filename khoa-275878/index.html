@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="vi">
+<html>
 <head>
   <meta charset="utf-8">
-  <title>Dũng English Speaking - Nộp Bài</title>
+  <title>Khoá 275878 (Lớp cuối tuần) - Dũng English Speaking</title>
   <link rel="icon" type="image/png" href="https://ssl.gstatic.com/docs/doclist/images/mediatype/icon_1_document_x16.png">
   <style>
     * {
@@ -56,6 +56,21 @@
       font-size: 16px;
     }
 
+    .back-link {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .back-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
     .class-selection {
       text-align: center;
       margin-bottom: 32px;
@@ -71,10 +86,11 @@
       display: flex;
       justify-content: center;
       gap: 15px;
+      flex-wrap: wrap;
     }
 
     .class-btn {
-      padding: 12px 24px;
+      padding: 16px 32px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
@@ -83,6 +99,7 @@
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
+      min-width: 180px;
     }
 
     .class-btn:hover {
@@ -110,32 +127,20 @@
 </head>
 <body>
   <div class="container">
-    <h1>Dũng English Speaking - Nộp Bài</h1>
-    <p class="subtitle">Chọn khoá học của bạn</p>
+    <div class="back-link">
+      <a href="/">← Quay lại trang chủ</a>
+    </div>
+    
+    <h1>Khoá 275878</h1>
+    <p class="subtitle">Lớp cuối tuần - Chọn loại bài nộp</p>
 
     <div class="class-selection">
       <div class="class-buttons">
-        <button class="class-btn" onclick="window.location.href='/khoa-243578'">
-          Khoá 243578
+        <button class="class-btn" onclick="window.location.href='/speaking/lop-275878'">
+          🎤 Nộp bài nói
         </button>
-      </div>
-
-      <div class="class-buttons" style="margin-top: 20px;">
-        <button class="class-btn" onclick="window.location.href='/khoa-4658'">
-          Khoá 4658
-        </button>
-      </div>
-
-      <div class="class-buttons" style="margin-top: 20px;">
-        <button class="class-btn" onclick="window.location.href='/khoa-275878'">
-          Khoá 275878 (Lớp cuối tuần)
-        </button>
-      </div>
-
-      <p class="class-question" style="margin-top: 40px;">Nộp lại bài viết</p>
-      <div class="class-buttons">
-        <button class="class-btn" onclick="window.location.href='/writing/nop-lai'">
-          Nộp Lại
+        <button class="class-btn" onclick="window.location.href='/writing/lop-cuoi-tuan'">
+          ✍️ Nộp bài viết
         </button>
       </div>
     </div>
