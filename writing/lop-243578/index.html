@@ -540,7 +540,7 @@
         classSelect.innerHTML = '<option value="">Chọn lớp</option>';
         classes.forEach(cls => {
           const option = document.createElement('option');
-          option.value = cls.value;
+          option.value = cls.text;
           option.textContent = cls.text;
           classSelect.appendChild(option);
         });
