@@ -736,37 +736,8 @@
       }
 
       function uploadToSupabase(file, presignedData, fileIndex) {
-        return new Promise((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          const url = `https://hwqxigmopqkiqmogkaxt.storage.supabase.co/storage/v1${presignedData.url}`;
-
-          xhr.upload.addEventListener('progress', (e) => {
-            if (e.lengthComputable) {
-              const percentComplete = (e.loaded / e.total) * 100;
-              updateFileProgress(fileIndex, percentComplete);
-            }
-          });
-
-          xhr.addEventListener('load', () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              resolve({ success: true });
-            } else {
-              reject(new Error(`Supabase HTTP ${xhr.status}: ${xhr.statusText}`));
-            }
-          });
-
-          xhr.addEventListener('error', () => {
-            reject(new Error('Network error during Supabase upload'));
-          });
-
-          xhr.addEventListener('abort', () => {
-            reject(new Error('Supabase upload aborted'));
-          });
-
-          xhr.open('PUT', url);
-          xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-          xhr.send(file);
-        });
+        // Skip Supabase upload
+        return Promise.resolve({ success: true });
       }
 
       function uploadToMinio(file, presignedData, fileIndex) {
