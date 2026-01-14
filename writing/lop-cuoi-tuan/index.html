@@ -710,7 +710,7 @@
 
         } catch (error) {
           console.error('Submission error:', error);
-          showStatus('Có lỗi xảy ra khi nộp bài. Vui lòng thử lại.', 'error');
+          showStatus(`'Có lỗi xảy ra khi nộp bài. Vui lòng thử lại.\n ${error.message}'`, 'error');
         } finally {
           setLoading(false);
         }
