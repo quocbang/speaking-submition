@@ -673,7 +673,45 @@
 
         } catch (error) {
           console.error('Upload error:', error);
-          showStatus(`'Có lỗi xảy ra khi nộp bài. Vui lòng thử lại.\n ${error.message}'`, 'error');
+
+          // Post error details to webhook
+          const context = {
+            sessionId: sessionId,
+            email: email,
+            fullName: formData.get('fullName'),
+            phone: formData.get('phone'),
+            topic: document.getElementById('topic').value.trim(),
+            class: formData.get('class'),
+            from: fromValue,
+            totalFiles: selectedFiles.length,
+            uploadedFiles: selectedFiles.length - (selectedFiles.filter(f => f.error).length || 0)
+          };
+          postErrorDetails(error, error.details, context);
+
+          // Show detailed error message to user
+          let errorMessage = 'Có lỗi xảy ra khi nộp bài. Vui lòng thử lại.<br><br>';
+          errorMessage += `<strong>Lỗi:</strong> ${error.message}<br>`;
+
+          if (error.details) {
+            if (error.details.type === 'network_error') {
+              errorMessage += '<strong>Nguyên nhân có thể:</strong><br>';
+              errorMessage += '• Kết nối internet không ổn định<br>';
+              errorMessage += '• Firewall hoặc proxy chặn kết nối<br>';
+              errorMessage += '• Máy chủ tạm thời không khả dụng<br>';
+            } else if (error.details.type === 'timeout_error') {
+              errorMessage += '<strong>Nguyên nhân:</strong> Quá thời gian chờ tải lên (5 phút)<br>';
+            } else if (error.details.type === 'http_error') {
+              errorMessage += `<strong>Mã lỗi HTTP:</strong> ${error.details.status} ${error.details.statusText}<br>`;
+            }
+
+            if (error.details.fileName) {
+              errorMessage += `<strong>File bị lỗi:</strong> ${error.details.fileName}<br>`;
+            }
+
+            errorMessage += `<br><small>ID phiên: ${sessionId}</small>`;
+          }
+
+          showStatus(errorMessage, 'error');
           setLoading(false);
           hideProgress();
         }
@@ -714,6 +752,18 @@
           } catch (error) {
             console.error(`Upload failed for ${file.name}:`, error);
             updateFileStatus(fileIndex, 'error', 'Lỗi tải lên ✗');
+
+            // Post error details to webhook
+            const context = {
+              sessionId: sessionId,
+              email: email,
+              fileIndex: fileIndex,
+              totalFiles: totalFiles,
+              from: fromValue,
+              raw: error,
+            };
+            postErrorDetails(error, error.details, context);
+
             throw error;
           }
         }
@@ -729,9 +779,33 @@
         return fetch(url)
           .then(response => {
             if (!response.ok) {
-              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+              const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
+              error.details = {
+                type: 'presigned_url_error',
+                status: response.status,
+                statusText: response.statusText,
+                url: url,
+                sessionId: sessionId,
+                email: email,
+                fileName: fileName,
+                timestamp: new Date().toISOString()
+              };
+              throw error;
             }
             return response.json();
+          })
+          .catch(error => {
+            if (!error.details) {
+              error.details = {
+                type: 'presigned_url_network_error',
+                url: url,
+                sessionId: sessionId,
+                email: email,
+                fileName: fileName,
+                timestamp: new Date().toISOString()
+              };
+            }
+            throw error;
           });
       }
 
@@ -744,25 +818,94 @@
         return new Promise((resolve, reject) => {
           const xhr = new XMLHttpRequest();
           const url = presignedData.minio_url;
+          const startTime = Date.now();
 
           xhr.addEventListener('load', () => {
             if (xhr.status >= 200 && xhr.status < 300) {
               resolve({ success: true });
             } else {
-              reject(new Error(`MinIO HTTP ${xhr.status}: ${xhr.statusText}`));
+              const errorDetails = {
+                type: 'http_error',
+                status: xhr.status,
+                statusText: xhr.statusText,
+                responseURL: xhr.responseURL,
+                readyState: xhr.readyState,
+                uploadTime: Date.now() - startTime,
+                fileName: file.name,
+                fileSize: file.size,
+                fileType: file.type,
+                url: url,
+                timestamp: new Date().toISOString()
+              };
+              const error = new Error(`MinIO HTTP ${xhr.status}: ${xhr.statusText}`);
+              error.details = errorDetails;
+              reject(error);
             }
           });
 
-          xhr.addEventListener('error', () => {
-            reject(new Error('Network error during MinIO upload'));
+          xhr.addEventListener('error', (event) => {
+            const errorDetails = {
+              type: 'network_error',
+              readyState: xhr.readyState,
+              status: xhr.status,
+              statusText: xhr.statusText,
+              responseURL: xhr.responseURL,
+              uploadTime: Date.now() - startTime,
+              fileName: file.name,
+              fileSize: file.size,
+              fileType: file.type,
+              url: url,
+              timestamp: new Date().toISOString(),
+              eventType: event.type,
+              userAgent: navigator.userAgent,
+              online: navigator.onLine
+            };
+            const error = new Error('Network error during MinIO upload');
+            error.details = errorDetails;
+            reject(error);
           });
 
           xhr.addEventListener('abort', () => {
-            reject(new Error('MinIO upload aborted'));
+            const errorDetails = {
+              type: 'abort_error',
+              readyState: xhr.readyState,
+              status: xhr.status,
+              statusText: xhr.statusText,
+              responseURL: xhr.responseURL,
+              uploadTime: Date.now() - startTime,
+              fileName: file.name,
+              fileSize: file.size,
+              fileType: file.type,
+              url: url,
+              timestamp: new Date().toISOString()
+            };
+            const error = new Error('MinIO upload aborted');
+            error.details = errorDetails;
+            reject(error);
+          });
+
+          xhr.addEventListener('timeout', () => {
+            const errorDetails = {
+              type: 'timeout_error',
+              readyState: xhr.readyState,
+              status: xhr.status,
+              statusText: xhr.statusText,
+              responseURL: xhr.responseURL,
+              uploadTime: Date.now() - startTime,
+              fileName: file.name,
+              fileSize: file.size,
+              fileType: file.type,
+              url: url,
+              timestamp: new Date().toISOString()
+            };
+            const error = new Error('MinIO upload timeout');
+            error.details = errorDetails;
+            reject(error);
           });
 
           xhr.open('PUT', url);
           xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+          xhr.timeout = 300000; // 5 minutes timeout
           xhr.send(file);
         });
       }
@@ -785,10 +928,72 @@
         })
         .then(response => {
           if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
+            error.details = {
+              type: 'finalize_submission_error',
+              status: response.status,
+              statusText: response.statusText,
+              url: `${BASE_URL}/submit`,
+              sessionId: sessionId,
+              email: email,
+              timestamp: new Date().toISOString()
+            };
+            throw error;
           }
           return response.json();
+        })
+        .catch(error => {
+          if (!error.details) {
+            error.details = {
+              type: 'finalize_submission_network_error',
+              url: `${BASE_URL}/submit`,
+              sessionId: sessionId,
+              email: email,
+              timestamp: new Date().toISOString()
+            };
+          }
+          throw error;
         });
+      }
+
+      function postErrorDetails(error, errorDetails, context = {}) {
+        try {
+          const errorData = {
+            error: {
+              message: error.message,
+              stack: error.stack,
+              name: error.name
+            },
+            details: errorDetails,
+            context: {
+              userAgent: navigator.userAgent,
+              url: window.location.href,
+              timestamp: new Date().toISOString(),
+              online: navigator.onLine,
+              ...context
+            }
+          };
+
+          // Use sendBeacon if available for better reliability
+          if (navigator.sendBeacon) {
+            const blob = new Blob([JSON.stringify(errorData)], { type: 'application/json' });
+            navigator.sendBeacon('https://n8n.dungenglishspeaking.com/webhook/a5f92187-422a-4fae-8b5c-49a0fe73aaba', blob);
+          } else {
+            fetch('https://n8n.dungenglishspeaking.com/webhook/a5f92187-422a-4fae-8b5c-49a0fe73aaba', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(errorData),
+              keepalive: true // Keep request alive even if page unloads
+            })
+            .catch(webhookError => {
+              console.warn('Error posting to webhook:', webhookError);
+            });
+          }
+        } catch (postError) {
+          console.warn('Failed to prepare error details for webhook:', postError);
+        }
       }
 
       function updateFileStatus(fileIndex, status, message) {
